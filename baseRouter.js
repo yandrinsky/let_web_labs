@@ -2,16 +2,19 @@ import { Router } from 'express';
 
 export const baseRouter = new Router();
 
+//request
+//response
 //1-2 labs
 baseRouter.get('/', (req, resp) => {
-  resp.status(400).json({ message: 'hello' });
+  resp.json({ message: 'hello' });
 });
 
 //3 lab
 baseRouter.get('/math', (req, resp) => {
-  resp
-    .status(400)
-    .json({ result: req.query.arg?.map(item => Number(item)).reduce((acc, item) => item + acc) });
+  console.log(req.query);
+  const result = req.query.arg?.map(item => Number(item)).reduce((acc, item) => item + acc, 0);
+
+  resp.json({ result });
 });
 
 //4 lab
@@ -24,25 +27,16 @@ baseRouter.get('/giveMeLocal', (req, resp) => {
   const lang = req.query.lang?.toLowerCase();
   const message = messages[lang] ?? 'Unsupportable language';
 
-  resp.status(400).send(
+  resp.send(
     `
-      <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
 <b>${message}</b>
-</body>
-</html>`
+`
   );
 });
 
 //5 lab
 baseRouter.get('/formValidate', (req, resp) => {
-  const sendBadResponse = () => resp.status(401).send('validation failed');
+  const sendBadResponse = () => resp.status(400).send('validation failed');
   const sendGoodResponse = () => resp.status(200).send('validation passed');
 
   const validate = ({ stringField, numberField }) => {
@@ -69,7 +63,7 @@ baseRouter.get('/formValidate', (req, resp) => {
 
 //5 lab
 baseRouter.get('/form', (req, resp) => {
-  resp.status(400).send(
+  resp.status(200).send(
     `
       <!DOCTYPE html>
 <html lang="en">
@@ -97,9 +91,9 @@ baseRouter.get('/form', (req, resp) => {
 
 //lab 6
 baseRouter.post('/login', (req, resp) => {
-  const sendBadValidationResponse = () => resp.status(401).send('validation failed');
+  const sendBadValidationResponse = () => resp.status(400).send('validation failed');
   const sendGoodResponse = () => resp.status(200).send('login');
-  const sendBadResponse = () => resp.status(401).send('authorization failed');
+  const sendBadResponse = () => resp.status(400).send('authorization failed');
 
   const { login, password } = req.body;
 
@@ -129,7 +123,7 @@ baseRouter.post('/login', (req, resp) => {
 
 //lab 6
 baseRouter.get('/login', (req, resp) => {
-  resp.status(400).send(
+  resp.status(200).send(
     `
       <!DOCTYPE html>
 <html lang="en">
