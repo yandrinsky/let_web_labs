@@ -177,7 +177,7 @@ baseRouter.get('/lab7', (req, resp) => {
 
 baseRouter.post('/lab7-post-color', (req, resp) => {
   const color = req.body.color ?? 'white';
-  console.log('color in server', color);
+
   resp.cookie('color', color);
   resp.status(200).send();
 });
