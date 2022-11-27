@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<button id="button">
+    get my name from server
+</button>
+<script>
+    document.querySelector('#button').onclick = async () => {
+        const response = await fetch('https://localhost:8080/lab8-get-my-name');
+        const name = await response.json();
+        alert(name);
+    }
+</script>
+</body>
+</html>

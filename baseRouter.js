@@ -1,9 +1,10 @@
 import { Router } from 'express';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 export const baseRouter = new Router();
 
-//request
-//response
 //1-2 labs
 baseRouter.get('/', (req, resp) => {
   resp.json({ message: 'hello' });
@@ -24,41 +25,45 @@ baseRouter.get('/giveMeLocal', (req, resp) => {
     en: 'Hello world'
   };
 
-  const lang = req.query.lang?.toLowerCase();
+  const lang = req.query.lang?.toLowerCase() ?? 'en';
   const message = messages[lang] ?? 'Unsupportable language';
 
   resp.send(
     `
-<b>${message}</b>
-`
+    <b>${message}</b>
+    `
   );
 });
+export const labFiveValidation = ({ stringField, numberField }) => {
+  const badResponse = () => ({ code: 200, message: 'validation failed' });
+  const goodResponse = () => ({ code: 400, message: 'validation passed' });
+
+  if (!stringField) {
+    return badResponse();
+  }
+  if (!numberField) {
+    return badResponse();
+  }
+
+  if (Number.isNaN(Number(numberField))) {
+    return badResponse();
+  }
+
+  if (Number(numberField) < 10 || Number(numberField) > 100000) {
+    return badResponse();
+  }
+
+  return goodResponse();
+};
 
 //5 lab
 baseRouter.get('/formValidate', (req, resp) => {
-  const sendBadResponse = () => resp.status(400).send('validation failed');
-  const sendGoodResponse = () => resp.status(200).send('validation passed');
+  const validation = labFiveValidation({
+    stringField: req.query.stringField,
+    numberField: req.query.numberField
+  });
 
-  const validate = ({ stringField, numberField }) => {
-    if (!stringField) {
-      return sendBadResponse();
-    }
-    if (!numberField) {
-      return sendBadResponse();
-    }
-
-    if (Number.isNaN(Number(numberField))) {
-      return sendBadResponse();
-    }
-
-    if (Number(numberField) < 10 || Number(numberField) > 100000) {
-      return sendBadResponse();
-    }
-
-    return sendGoodResponse();
-  };
-
-  validate({ stringField: req.query.stringField, numberField: req.query.numberField });
+  resp.status.code({ code: validation.code }).send(validation.message);
 });
 
 //5 lab
@@ -73,7 +78,7 @@ baseRouter.get('/form', (req, resp) => {
 </head>
 <body>
 
-<form action="http://localhost:5010/formValidate">
+<form action="https://localhost:8080/formValidate">
     <lable>
     text field
     <input placeholder="заполните" required name="stringField"></imput>
@@ -133,18 +138,57 @@ baseRouter.get('/login', (req, resp) => {
 </head>
 <body>
 
-<form method="post" action="https://localhost:5010/login">
+<form method="post" action="https://localhost:8080/login" style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px">
     <lable>
-    login
-    <input placeholder="login" required name="login" type="email"></imput>
-</lable>
- <lable>
-     password
-     <input placeholder="password" required name="password" type="password"></imput>
-</lable>
-<button>send</button>
+        login
+        <input placeholder="login" required name="login" type="email"></imput>
+    </lable>
+     <lable>
+        password
+        <input placeholder="password" required name="password" type="password"></imput>
+    </lable>
+     <button>send</button>
 </form>   
 </body>
 </html>`
   );
+});
+
+//lab-7
+baseRouter.get('/lab7', (req, resp) => {
+  if (req.session.views) {
+    req.session.views++;
+  } else {
+    req.session.views = 1;
+  }
+
+  const color = req.cookies.color ?? 'white';
+
+  resp.send(`
+      <div style="background-color: ${color}">
+        <p>views: ${req.session.views}</p>
+        <form method="post" action="https://localhost:8080/lab7-post-color">
+          <input type="color" name="color">
+          <button>задать цвет</button>
+        </form>
+      </div>
+  `);
+});
+
+baseRouter.post('/lab7-post-color', (req, resp) => {
+  const color = req.body.color ?? 'white';
+  console.log('color in server', color);
+  resp.cookie('color', color);
+  resp.status(200).send();
+});
+
+//lab-8
+baseRouter.get('/lab8', (req, resp) => {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  resp.sendFile(path.join(__dirname, './client/lab8.html'));
+});
+
+baseRouter.get('/lab8-get-my-name', (req, resp) => {
+  resp.json('vladosik');
 });
