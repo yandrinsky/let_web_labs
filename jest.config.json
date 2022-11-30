@@ -1,0 +1,7 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "./",
+  "testEnvironment": "node",
+  "watchPathIgnorePatterns": [".*node_modules.*"],
+  "testTimeout": 120000
+}
